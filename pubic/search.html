@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+    <title></title>
+    <link rel="stylesheet" href="css/zhesheji.css">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/style_left.css">
+</head>
+<body>
+<header id="header"></header>
+<div id="search">
+   <div class="search">
+       <div>
+           <span id="select">原创作品<i></i></span>
+           <ul @click="select">
+               <li value="1">原创作品</li>
+               <li value="2">设计师</li>
+               <li value="3">经验</li>
+               <li value="4">灵感</li>
+           </ul>
+       </div>
+       <input type="text" placeholder="搜索" v-model="searchBar" @keyup.13="searc">
+       <button @click="searc"></button>
+   </div>
+    <div>
+        <div>
+        <ul>
+            <li :class="{ablue:cvl==1}">原创作品</li>
+            <li :class="{ablue:cvl==2}">设计师</li>
+            <li>经验</li>
+            <li>灵感</li>
+        </ul>
+            <span>最新作品<i></i></span>
+        <span>全部<i></i></span>
+        </div>
+    </div>
+    <div>
+   <span>“{{searchBar}}”共找到{{numel}}个搜索内容</span>
+    </div>
+    <div>
+        <div class="shangchuan">
+            <div class="fenye" style="background:#fff;min-height: 500px">
+                <ul id="fenye">
+                    <li v-for="v in search1">
+                        <a :href="'http://127.0.0.1:3000/details.html?'+v.sid"><img :src="v.img
+" height="180" width="290" style="border-radius: 10px"></a>
+                        <h3><a :href="'http://127.0.0.1:3000/details.html?'+v.sid">&nbsp;&nbsp;&nbsp;&nbsp;{{v.headline}}</a></h3>
+                        <div><i class="yanjing"></i> {{v.view}} &nbsp;&nbsp;<i class="dianzan"> </i>{{v.likes}} &nbsp;&nbsp;<i class="pinglun"> </i>{{v.comment}}</div>
+                        <div class="user_name" style="margin: 0;color: #000;height: 30px;"><a href="#"> <img :src="v.headPortrait" alt="" class="touxiang">&nbsp;&nbsp;&nbsp;{{v.names}}</a></div>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    </div>
+</div>
+<footer id="footer"></footer>
+</body>
+<script src="js/vue.js"></script>
+<script src="js/jquery-1.11.3.js"></script>
+<script src="js/axios.min.js"></script>
+<script src="js/qs.min.js"></script>
+<script src="js/header.js"></script>
+<script src="js/footer.js"></script>
+<script>
+  new Vue({
+      el:"#search",
+      data:{
+          searchBar:sessionStorage.sear,
+          search1:[],
+          numel:0,
+          cvl:1
+      },
+      created(){
+
+  },
+      methods:{
+          select:function(e){
+              var select=document.getElementById("select");
+              select.innerHTML=e.target.innerHTML+"<i></i>";
+              select.value=e.target.value;
+          },
+          searc:function(){
+              sessionStorage.setItem("sear",this.searchBar);
+              axios.get("user/search",{params:{sear:this.searchBar,select0:select.value}})
+                  .then(res=>{
+                      (select.value==null)?this.cvl=1:this.cvl=select.value;
+                      this.search1=res.data;
+                      this.numel=this.search1.length;
+
+                  })
+          }
+      },
+      mounted(){
+          this.searc();
+      }
+  })
+</script>
+</html>

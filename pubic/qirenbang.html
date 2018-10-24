@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+    <title>气人榜</title>
+    <script src="js/vue.js"></script>
+    <link rel="stylesheet" href="css/zhesheji.css">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/style_left.css">
+</head>
+<style>
+    body{
+       background:#F2F2F2;
+    }
+</style>
+<body>
+<header id="header"></header>
+<div id="qirenbang">
+    <div ><a href="#"></a></div>
+    <div>
+        <ul>
+            <li><a href="#">人气榜</a><i class="bottomj"></i></li>
+            <li><a href="#">赞排行</a><i class="bottomj"></i></li>
+            <li><a href="#">评论榜</a><i class="bottomj"></i></li>
+        </ul>
+        <div>
+           <i></i> 如何提高排名
+        </div>
+        <span>
+            <i class="topl"></i>
+            <p>1. 上传原创作品: 你上传了作品被浏览越多人气就越高</p>
+            <p>2. 作品被评论/赞: 你上传了作品被浏览越多人气就越高</p>
+            <p>3. 评论别人的作品: 每天评论别人的作品越多,得分越高;评论得越详细,对上传者越有帮助,得分越高</p>
+             <p>4. 让别人关注: 让更多人关注你,得分越高;让有人气的设计师关注你,得分越高</p>
+        </span>
+        <div>
+       <ul>
+           <li>周排行</li>
+           <li>月排行</li>
+           <li>总排行</li>
+       </ul>
+            <button>发布作品</button> <span>排名总是上不去？试试发布新作品看看？</span>
+        </div>
+    </div>
+     <div>
+         <ul>
+             <li class="qirencheng" v-for="v in rank" :key="v.id">
+                 <div>{{v.qid}}</div>
+                 <a href="#"> <img :src="v.timgs" alt="" width="120" height="120"> </a>
+                 <div style="position:relative">
+                     <div><a href="#">{{v.uname}}</a></div>
+                     <div>粉丝数:&nbsp&nbsp{{v.fans}}&nbsp&nbsp&nbsp人气:&nbsp&nbsp{{v.qirenzhi}}</div>
+                     <div><a href="#">关注</a><a href="#">私信</a></div>
+                 </div>
+                 <ul>
+                     <li><a href="#"><img :src="v.production1" alt=""></a></li>
+                     <li><a href="#"><img :src="v.production2" alt=""></a></li>
+                     <li><a href="#"><img :src="v.production3" alt=""></a></li>
+                 </ul>
+             </li>
+         </ul>
+     </div>
+</div>
+<footer id="footer"></footer>
+</body>
+<script src="js/jquery-1.11.3.js"></script>
+<script src="js/axios.min.js"></script>
+<script src="js/qs.min.js"></script>
+<script src="js/header.js"></script>
+<script src="js/footer.js"></script>
+<script>
+   new Vue({
+    el:"#qirenbang",
+       data:{
+        rank:[]
+       },
+       created(){
+      axios.get("user/rank").then(res=>{
+          this.rank=res.data;
+          })
+       }
+   })
+
+
+</script>
+</html>

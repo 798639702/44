@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+    <title></title>
+    <script src="js/vue.js"></script>
+    <link rel="stylesheet" href="css/zhesheji.css">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/style_left.css">
+</head>
+<body style="background:#f6f6f6">
+<header id="header"></header>
+<div id="shoucang">
+<div><img src="../imgs/qtou11_12_13_14_15_17_19_20_26_29_41_42_44_49.gif" width="80" height="80" alt=""><div>{{uname}}</div></div>
+<div>
+    <ul>
+        <li>好友动态</li>
+        <li>我的关注</li>
+        <li>我的粉丝</li>
+        <li>我的收藏</li>
+        <li>我的作品</li>
+    </ul>
+</div>
+<div>
+    <h3>我的收藏</h3>
+    <hr>
+        <ul id="fenye">
+            <li class="jinyan" v-for="v in products" style="width:30%">
+                <a :href="'http://127.0.0.1:3000/details.html?'+v.sid"><img :src="v.img
+" height="180" width="290" style="border-radius: 10px"></a>
+                <h3><a :href="'http://127.0.0.1:3000/details.html?'+v.sid">&nbsp;&nbsp; &nbsp;&nbsp;{{v.headline}}</a></h3>
+                <div><i class="yanjing"></i> {{v.view}} &nbsp;&nbsp;<i class="dianzan"> </i>{{v.likes}} &nbsp;&nbsp;<i class="pinglun"> </i>{{v.comment}}</div>
+                <div class="user_name" style="margin: 0;color: #000;height: 30px;"><a href="#"> <img :src="v.headPortrait" alt="" class="touxiang">&nbsp;&nbsp;&nbsp;{{v.names}}</a></div>
+            </li>
+        </ul>
+    <div class="btns">
+        <input type="button" value="上一页" @click="previous" style="cursor:pointer" >
+        <input type="button" style="cursor:pointer" v-for="(v,index) in n"  :value="v" :class="{yeshu:index==curr}" @click="paging(index)" >
+        <input type="button" value="下一页" @click="next" style="cursor:pointer" >
+    </div>
+</div>
+</div>
+<footer id="footer"></footer>
+</body>
+<script src="js/jquery-1.11.3.js"></script>
+<script src="js/axios.min.js"></script>
+<script src="js/qs.min.js"></script>
+<script src="js/header.js"></script>
+<script src="js/footer.js"></script>
+<script>
+    new Vue({
+        el:"#shoucang",
+        data:{
+            products:[],
+            shou:[],
+            uname:"",
+            curr:0,
+            n:0
+        },
+        created(){
+            this.uname=localStorage.getItem("uname");
+            axios.get("/user/yshou",{params:{uid:localStorage.getItem("uid")}})
+                .then(result=>{
+					
+                    this.shou=result.data[0].shou.split(",");
+                    let s=[];
+					this.shou.shift();
+                    for(var i=0;i<this.shou.length;i+=3){
+                        s.push(this.shou.slice(i,i+3));
+						
+                    }
+					
+                    this.shou=s;
+                    this.n=this.shou.length;
+                }).then(()=> {
+                axios.get("/user/wshoucang", {params: {shou: this.shou[0]}}).then(result => {
+                    this.products=result.data;
+                })
+            })
+        },
+        methods:{
+            paging:function(index){
+                this.curr=index;
+                axios.get("/user/wshoucang", {params: {shou: this.shou[this.curr]}}).then(result => {
+                    this.products=result.data;
+                })
+            },
+            next:function(){
+                if(this.curr!==(this.n-1)){
+                this.curr+=1;
+                axios.get("/user/wshoucang", {params: {shou: this.shou[this.curr]}}).then(result => {
+                    this.products=result.data;
+                })}
+            },
+            previous:function(){
+                if(this.curr!==0){
+                this.curr-=1;
+                axios.get("/user/wshoucang", {params: {shou: this.shou[this.curr]}}).then(result => {
+                    this.products=result.data;
+                })
+            }
+            }
+        }
+
+    })
+</script>
+</html>

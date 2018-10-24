@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+    <title>教程</title>
+    <script src="js/vue.js"></script>
+    <link rel="stylesheet" href="css/zhesheji.css">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/style_left.css">
+
+</head>
+<body>
+<header id="header"></header>
+<div id="jiaocheng">
+<div>
+    <ul>
+        <li><span>全部作品</span><i></i>
+            <ul>
+                <li>全部作品</li>
+                <li>设计教程&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp></li>
+                <li>经验分享&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp></li>
+                <li>视频教程&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp></li>
+            </ul>
+        </li>
+        <li><span>全部</span><i></i>
+        <ul style="left:-50px">
+            <li>全部</li>
+            <li>首页推荐</li>
+            <li>编辑精选</li>
+        </ul>
+        </li>
+        <li><span>最新作品</span><i></i>
+        <ul>
+            <li>最新作品</li>
+            <li>点赞最多</li>
+            <li>评论最多</li>
+            <li>浏览最多</li>
+        </ul>
+        </li>
+    </ul>
+    <div style="position:relative">
+        <a href="#">上传作品</a>
+       <ul>
+           <li><a href="#">上传原创作品</a></li>
+           <li><a href="#">上传经验教程</a></li>
+           <li><a href="#">上传设计欣赏</a></li>
+       </ul>
+    </div>
+</div>
+    <div>
+        <div class="shangchuan">
+            <div class="fenye">
+                <ul id="fenye">
+                    <li v-for="v in products">
+                        <a :href="'http://127.0.0.1:3000/details.html?'+v.sid" ><img :src="v.img
+" height="180" width="290" style="border-radius: 10px"></a>
+                        <h3><a :href="'http://127.0.0.1:3000/details.html?'+v.sid">&nbsp;&nbsp;&nbsp;&nbsp;{{v.headline}}</a></h3>
+                        <div><i class="yanjing"></i> {{v.view}} &nbsp;&nbsp;<i class="dianzan"> </i>{{v.likes}} &nbsp;&nbsp;<i class="pinglun"> </i>{{v.comment}}</div>
+                        <div class="user_name" style="margin: 0;color: #000;height: 30px;"><a href="#"> <img :src="v.headPortrait" alt="" class="touxiang">&nbsp;&nbsp;&nbsp;{{v.names}}</a></div>
+                    </li>
+                </ul>
+                <div>
+                    <input type="button" value="上一页" @click="previous" style="cursor:pointer" >
+                    <input type="button"  style="cursor:pointer" :value="1" :class="{yeshu:curr==0}" @click="paging(0)" >
+                    <div v-if="curr>3">...</div>
+                    <input type="button" v-show="(index+1)<curr+3&&(index+1)>curr-3"  style="cursor:pointer" v-for="(v,index) in n"  :value="v+1" :class="{yeshu:(index+1)==curr}" @click="paging(index+1)" >
+                    <div v-if="curr<(n-2)">...</div>
+                    <input type="button"  style="cursor:pointer"  :value="n+2" :class="{yeshu:(n+1)==curr}" @click="paging(n+1)" >
+                    <input type="button" value="下一页" @click="next" style="cursor:pointer" >
+                </div>
+            </div>
+        </div>
+        </div>
+    </div>
+<footer id="footer"></footer>
+</body>
+<script src="js/jquery-1.11.3.js"></script>
+<script src="js/axios.min.js"></script>
+<script src="js/qs.min.js"></script>
+<script src="js/header.js"></script>
+<script src="js/footer.js"></script>
+<script>
+  new Vue({
+      el:"#jiaocheng",
+      data:{
+          n:0,
+          curr:0,
+          products:[],
+          dianti:0
+
+      },
+      methods:{
+          previous:function(){
+              if(!this.curr==0) {this.curr--;$("html").animate({scrollTop:525},0);
+              axios.post("http://127.0.0.1:3000/user/recommend",Qs.stringify({ye:this.curr}))
+                  .then(res=>{
+                      this.products=res.data.result;
+                  })
+          }
+          },
+          paging:function(index){
+              if(!(this.curr==index)){
+                  this.curr=index;
+                  axios.post("http://127.0.0.1:3000/user/recommend",Qs.stringify({ye:this.curr}))
+                      .then(res=>{
+                          this.products=res.data.result;
+                          $("html").animate({scrollTop:525},0);
+                      })
+              }
+          },
+          next:function(){
+              if(!(this.curr+1==this.n))
+              {
+                  this.curr++;
+                  $("html").animate({scrollTop:525},0);
+
+              }
+              axios.post("http://127.0.0.1:3000/user/recommend",Qs.stringify({ye:this.curr}))
+                  .then(res=>{
+                      this.products=res.data.result;
+
+                  })
+          },
+          diantidianji:function(e){
+              var et=e.target;
+              $("html").animate({scrollTop:et.value});
+          }
+
+      },
+      created(){
+          axios.post("http://127.0.0.1:3000/user/recommendye",Qs.stringify({n:this.n}))
+              .then(res=>{
+                  this.n=res.data.xi-2;
+              }),
+              axios.post("http://127.0.0.1:3000/user/recommend",Qs.stringify({ye:this.curr}))
+                  .then(res=>{
+                      console.log(res);
+                      this.products=res.data.result;
+                  })
+      }
+  });
+
+</script>
+</html>

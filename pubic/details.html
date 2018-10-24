@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+    <title></title>
+    <script src="js/vue.js"></script>
+    <link rel="stylesheet" href="css/zhesheji.css">
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="stylesheet" href="css/style_left.css">
+</head>
+<body>
+<header id="header"></header>
+<div id="details">
+    <div>
+      <h3>{{xinxi.headline}}</h3>
+        <span> 发布时间：6小时前</span><br>
+        <div><i class="yanjing"></i>{{xinxi.view}} &nbsp;&nbsp;<i class="dianzan"> </i>{{xinxi.likes}} &nbsp;&nbsp;<i class="pinglun"> </i>{{xinxi.comment}}</div>
+        <div>
+       <img :src="xinxi.headPortrait">
+            <span>{{xinxi.names}}</span>
+            <button>关注</button>
+            <button>私信</button>
+        </div>
+    </div>
+    <div></div>
+    <div @click="dianzan">
+        <div :class="{DianZan:x}"></div>
+        <img src="imgs/点赞.png" alt="" width="40" height="40">
+        <span>16</span>
+    </div>
+    <div @click="shoucang()" :class="{huise:shoup}">{{shoucangs}}</div>
+    <div>
+        <div>
+            <a href="#"><img src="imgs/微信.png" alt=""></a>
+            <a href="#"><img src="imgs/新浪.png" alt=""></a>
+            <a href="#"><img src="imgs/QQ.png" alt=""></a>
+            <a href="#"><img src="imgs/QQ空间.png" alt=""></a>
+            <a href="#"><img src="imgs/report.png">举报</a>
+        </div>
+    </div>
+    <div>
+        <p>作者很希望看到你的用心评论哦 (21)</p>
+        <textarea maxlength="500" placeholder="据说认真交流的都成为大神了~" v-model="pinglun"></textarea>
+        <span>{{length}}/500</span>
+        <button>评论</button>
+    </div>
+    <div>
+        <p>全部评论（）</p>
+        <div></div>
+    </div>
+</div>
+<footer id="footer"></footer>
+</body>
+<script src="js/jquery-1.11.3.js"></script>
+<script src="js/axios.min.js"></script>
+<script src="js/qs.min.js"></script>
+<script src="js/header.js"></script>
+<script src="js/footer.js"></script>
+<script>
+    new Vue({
+        el:"#details",
+        data:{
+         x:false,
+         sid:location.search.split("?")[1],
+         xinxi:[],
+         pinglun:"",
+         length:0,
+         shou:[],
+         shoup:false,
+         shoucangs:"收藏",
+
+        },
+        created(){
+            axios.get("/user/yshou",{params:{uid:localStorage.getItem("uid")}})
+                .then(result=>{
+                    this.shou=result.data[0].shou.split(",");
+                    if(this.shou.indexOf(this.sid+"")===-1)
+                    {this.shoup=false;}
+                    else
+                    {this.shoup=true;this.shoucangs = "已收藏";}
+                })
+            axios.post("http://127.0.0.1:3000/user/xiangqiang",Qs.stringify({xiang:this.sid}))
+                .then(result=>{
+                    this.xinxi=result.data.result[0];
+                })
+
+       } ,
+        methods:{
+            shoucang:function(){
+                if(!this.shoup){this.shoup=true;this.shoucangs = "已收藏";
+               this.shou.push(this.sid);
+             axios.get("/user/shoucang",{params:{uid:localStorage.getItem("uid"),shou:this.shou}}).then(result=>{
+     console.log(result.data);
+             })
+                }
+            },
+         dianzan:function(){
+          this.x=true;
+         }
+        },
+        mounted(){
+
+        },
+        watch:{
+            pinglun(){
+                this.length=this.pinglun.length;
+            }
+        }
+    })
+</script>
+</html>
